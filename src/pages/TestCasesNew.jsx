@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Plus, ChevronDown, ChevronRight, Edit, Trash2, Play, MoreVertical, Search, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import './TestCasesNew.css'
 
 // Internal Components
@@ -20,11 +20,18 @@ const MemoizedTestResultsListView = React.memo(TestResultsListView)
 
 const TestCasesNew = () => {
     const navigate = useNavigate()
+    const { projectId } = useParams()
+    const [projectInfo, setProjectInfo] = useState({ name: 'Loading...' })
 
     // --- State Management ---
     const loadFromStorage = (key, defaultValue) => {
         try {
-            const saved = localStorage.getItem(key)
+            // Scope key by projectId
+            const scopedKey = `project_${projectId}_${key}`
+            const saved = localStorage.getItem(scopedKey)
+
+            // Fallback to global validation for migration if needed? No, let's keep it simple.
+            // If empty, return default
             return saved ? JSON.parse(saved) : defaultValue
         } catch (error) {
             console.error('Error loading from localStorage:', error)
@@ -32,9 +39,28 @@ const TestCasesNew = () => {
         }
     }
 
-    const [modules, setModules] = useState(() => loadFromStorage('testModules', []))
-    const [testPlans, setTestPlans] = useState(() => loadFromStorage('testPlans', []))
-    const [testResults, setTestResults] = useState(() => loadFromStorage('testResults', []))
+    const [modules, setModules] = useState([])
+    const [testPlans, setTestPlans] = useState([])
+    const [testResults, setTestResults] = useState([])
+
+    // Load initial data when projectId changes
+    useEffect(() => {
+        if (!projectId) return
+
+        // Load project metadata
+        const projects = JSON.parse(localStorage.getItem('banana_projects') || '[]')
+        const currentProject = projects.find(p => p.id === projectId)
+        if (currentProject) {
+            setProjectInfo(currentProject)
+        } else {
+            setProjectInfo({ name: 'Unknown Project' })
+        }
+
+        // Load project specific data
+        setModules(loadFromStorage('testModules', []))
+        setTestPlans(loadFromStorage('testPlans', []))
+        setTestResults(loadFromStorage('testResults', []))
+    }, [projectId])
 
     // UI State
     const [activeTab, setActiveTab] = useState('summary')
@@ -57,23 +83,61 @@ const TestCasesNew = () => {
     const [showResultRenameModal, setShowResultRenameModal] = useState(false)
 
     // --- Effects ---
-    useEffect(() => {
-        localStorage.setItem('testModules', JSON.stringify(modules))
-    }, [modules])
+    // Save to scoped storage
+    const saveToStorage = (key, data) => {
+        if (projectId) {
+            localStorage.setItem(`project_${projectId}_${key}`, JSON.stringify(data))
+        }
+    }
 
     useEffect(() => {
-        localStorage.setItem('testPlans', JSON.stringify(testPlans))
-    }, [testPlans])
+        if (modules.length > 0) saveToStorage('testModules', modules)
+
+        // Update case count in project list metadata
+        if (modules.length > 0 && projectId) {
+            let totalCases = 0
+            modules.forEach(m => m.scenarios.forEach(s => totalCases += s.testCases.length))
+
+            const projects = JSON.parse(localStorage.getItem('banana_projects') || '[]')
+            const updatedProjects = projects.map(p =>
+                p.id === projectId ? { ...p, caseCount: totalCases } : p
+            )
+            // prevent infinite loop by only saving if changed? 
+            // Actually this is safe as long as projects isn't a dependency of this effect
+            localStorage.setItem('banana_projects', JSON.stringify(updatedProjects))
+        }
+
+    }, [modules, projectId])
+
+    useEffect(() => {
+        if (testPlans.length > 0) saveToStorage('testPlans', testPlans)
+    }, [testPlans, projectId])
 
     // Load results on mount or tab change to ensure freshness
     useEffect(() => {
-        const savedResults = loadFromStorage('testResults', [])
-        setTestResults(savedResults)
-    }, [activeTab])
+        // Reload results
+        if (projectId) {
+            const savedResults = loadFromStorage('testResults', [])
+            setTestResults(savedResults)
+        }
+    }, [activeTab, projectId])
 
     const saveTestResults = (newResults) => {
         setTestResults(newResults)
-        localStorage.setItem('testResults', JSON.stringify(newResults))
+        saveToStorage('testResults', newResults)
+
+        // Update last tested date
+        if (projectId && newResults.length > 0) {
+            const lastTest = newResults.reduce((latest, current) => {
+                return new Date(current.executedAt) > new Date(latest.executedAt) ? current : latest
+            }, newResults[0])
+
+            const projects = JSON.parse(localStorage.getItem('banana_projects') || '[]')
+            const updatedProjects = projects.map(p =>
+                p.id === projectId ? { ...p, lastTested: new Date(lastTest.executedAt).toLocaleString() } : p
+            )
+            localStorage.setItem('banana_projects', JSON.stringify(updatedProjects))
+        }
     }
 
     // --- Helpers ---
@@ -345,8 +409,12 @@ const TestCasesNew = () => {
         <div className="test-cases-new-page">
             <div className="test-cases-new-header">
                 <div>
-                    <h1>Test Cases Management</h1>
-                    <p>จัดการ Test Cases แบบมีโครงสร้าง</p>
+                    <h5 className="breadcrumbs">
+                        <Link to="/" className="breadcrumb-link">All Projects</Link>
+                        <span className="breadcrumb-separator">›</span>
+                        <span className="breadcrumb-current">{projectInfo.name}</span>
+                    </h5>
+                    <h1>{projectInfo.name}</h1>
                 </div>
                 <div className="header-actions">
                     <div className="search-box">

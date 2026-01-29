@@ -859,3 +859,36 @@ input[type="checkbox"] {
         transform: translateY(0);
     }
 }
+/* Breadcrumbs */
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+}
+
+.breadcrumb-link {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.1s;
+}
+
+.breadcrumb-link:hover {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+.breadcrumb-separator {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.breadcrumb-current {
+    color: #0f172a;
+    font-weight: 600;
+}
+
