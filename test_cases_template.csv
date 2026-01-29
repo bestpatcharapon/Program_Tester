@@ -1,0 +1,16 @@
+Test Name,Framework,Priority,Tags,Description
+Login with valid credentials,playwright,high,"smoke,login",Test user login with correct username and password
+Login with invalid credentials,playwright,high,"smoke,login,negative",Test user login with incorrect credentials
+API - Create User,pytest,medium,"api,user,crud",Test POST /api/users endpoint to create new user
+API - Get User List,pytest,medium,"api,user",Test GET /api/users endpoint to retrieve user list
+API - Update User,pytest,low,"api,user,crud",Test PUT /api/users/{id} endpoint to update user data
+API - Delete User,pytest,low,"api,user,crud",Test DELETE /api/users/{id} endpoint to remove user
+Checkout Flow - Add to Cart,robot,high,"e2e,checkout",Test adding products to shopping cart
+Checkout Flow - Payment,robot,critical,"e2e,checkout,payment",Test payment process with valid card
+Search Functionality,playwright,medium,"search,ui",Test product search with various keywords
+User Registration,playwright,high,"registration,user",Test new user registration flow
+Password Reset,playwright,medium,"password,user",Test password reset functionality
+Profile Update,playwright,low,"profile,user",Test user profile information update
+Product Filter,playwright,medium,"filter,product",Test product filtering by category and price
+Responsive Design - Mobile,playwright,low,"responsive,ui",Test UI responsiveness on mobile devices
+Responsive Design - Tablet,playwright,low,"responsive,ui",Test UI responsiveness on tablet devices
