@@ -9,7 +9,7 @@ import subprocess
 import json
 from pathlib import Path
 
-app = FastAPI(title="AutoTest Center API", version="1.0.0")
+app = FastAPI(title="Besttest API", version="1.0.0")
 
 # CORS middleware
 app.add_middleware(
@@ -52,7 +52,7 @@ running_tests = {}
 @app.get("/")
 async def root():
     return {
-        "name": "AutoTest Center API",
+        "name": "Besttest API",
         "version": "1.0.0",
         "status": "running"
     }

@@ -18,7 +18,7 @@ const createWindow = () => {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    icon: path.join(__dirname, '../public/icon.png')
+    icon: path.join(__dirname, '../public/logo.png')
   })
 
   // Load the app
@@ -48,11 +48,11 @@ const createWindow = () => {
 }
 
 const createTray = () => {
-  tray = new Tray(path.join(__dirname, '../public/icon.png'))
+  tray = new Tray(path.join(__dirname, '../public/logo.png'))
   
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show AutoTest Center',
+      label: 'Show Besttest',
       click: () => {
         mainWindow.show()
       }
@@ -83,7 +83,7 @@ const createTray = () => {
     }
   ])
 
-  tray.setToolTip('AutoTest Center')
+  tray.setToolTip('Besttest')
   tray.setContextMenu(contextMenu)
 
   tray.on('click', () => {

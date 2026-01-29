@@ -146,8 +146,8 @@ const TestExecutionModal = ({
                         See logs
                     </button>
                     <div className="footer-right">
-                        <button className="btn-finish" onClick={onSaveAndClose}>
-                            Finish
+                        <button className="btn-next" onClick={onNext}>
+                            Save next
                         </button>
                         <button className="btn-cancel" onClick={onClose}>
                             Cancel

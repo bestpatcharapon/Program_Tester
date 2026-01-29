@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Search, Share2, Download, Book } from 'lucide-react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import './TestResults.css'
 import TestExecutionModal from '../components/test-cases/TestExecutionModal'
 
 const TestResults = () => {
     const navigate = useNavigate()
     const location = useLocation()
+    const { projectId } = useParams()
 
     // --- State Initialization ---
 
@@ -113,33 +114,43 @@ const TestResults = () => {
         // Optionally save to backend/localstorage here immediately
     }
 
-    const handleFinishExecution = () => {
+    const handleFinishExecution = useCallback(() => {
+        // Calculate stats on the fly to ensure freshness
+        const currentTotal = testCases.length
+        if (currentTotal === 0) return
+
+        const currentPassed = testCases.filter(tc => tc.result === 'Passed').length
+        const currentFailed = testCases.filter(tc => tc.result === 'Failed').length
+        const currentSkipped = testCases.filter(tc => tc.result === 'Skipped').length
+        const currentNotTested = currentTotal - currentPassed - currentFailed - currentSkipped
+
         // Prepare summary object
         const summary = {
             id: `TR-${Date.now()}`,
             planId: testPlan.id,
             planName: testPlan.title,
             executedAt: new Date().toISOString(),
-            total: stats.total,
-            passed: stats.passed,
-            failed: stats.failed,
-            skipped: stats.skipped,
-            notTested: stats.notTested,
+            total: currentTotal,
+            passed: currentPassed,
+            failed: currentFailed,
+            skipped: currentSkipped,
+            notTested: currentNotTested,
             details: testCases // Save all details
         }
 
         // Save to LocalStorage
         try {
-            const existingResults = JSON.parse(localStorage.getItem('testResults') || '[]')
+            const scopedKey = `project_${projectId}_testResults`
+            const existingResults = JSON.parse(localStorage.getItem(scopedKey) || '[]')
             const updatedResults = [summary, ...existingResults]
-            localStorage.setItem('testResults', JSON.stringify(updatedResults))
+            localStorage.setItem(scopedKey, JSON.stringify(updatedResults))
             console.log('Saved Execution:', summary)
         } catch (error) {
             console.error('Failed to save:', error)
         }
 
-        navigate('/testcases-new') // Go back to dashboard
-    }
+        navigate(`/project/${projectId}`, { state: { activeTab: 'test-results' } })
+    }, [testCases, testPlan, projectId, navigate])
 
     // Current case for modal
     const currentCase = testCases[currentModalIndex]
@@ -244,6 +255,31 @@ const TestResults = () => {
                         )}
                     </div>
                 </div>
+                {/* Floating Footer Navigation */}
+                <div className="results-footer-bar">
+                    <div className="pagination-controls">
+                        <button className="page-btn disabled">«</button>
+                        <button className="page-btn disabled">‹</button>
+                        <button className="page-btn active">1</button>
+                        <button className="page-btn">2</button>
+                        <button className="page-btn">3</button>
+                        <button className="page-btn">4</button>
+                        <button className="page-btn">5</button>
+                        <button className="page-btn">6</button>
+                        <button className="page-btn">›</button>
+                        <button className="page-btn">»</button>
+                        <select className="page-select">
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select>
+                    </div>
+                    <div className="footer-actions">
+                        <button className="btn-continue" onClick={handleFinishExecution}>Continue</button>
+                        <button className="btn-finish-footer" onClick={handleFinishExecution}>Finish</button>
+                    </div>
+                </div>
+
             </div>
 
             {/* Modal */}
@@ -256,7 +292,7 @@ const TestResults = () => {
                 onPrev={handleModalPrev}
                 onNext={handleModalNext}
                 onUpdateResult={handleUpdateResult}
-                onSaveAndClose={handleSaveAndClose}
+                onSaveAndClose={handleFinishExecution}
             />
         </div>
     )

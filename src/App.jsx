@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Projects from './pages/Projects'
@@ -6,13 +7,14 @@ import TestResults from './pages/TestResults'
 import Settings from './pages/Settings'
 import './App.css'
 
-
 function App() {
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+
     return (
         <Router>
             <div className="app">
-                <Sidebar />
-                <main className="main-content">
+                <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
+                <main className="main-content" style={{ marginLeft: isSidebarCollapsed ? '80px' : '280px', transition: 'margin-left 0.3s ease' }}>
                     <Routes>
                         <Route path="/" element={<Projects />} />
                         <Route path="/settings" element={<Settings />} />

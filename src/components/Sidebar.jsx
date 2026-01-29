@@ -1,13 +1,17 @@
 import { NavLink } from 'react-router-dom'
 import {
-    Zap,
     TestTube,
     FileText,
-    Settings
+    Settings,
+    ChevronLeft,
+    ChevronRight,
+    PanelLeftClose,
+    PanelLeftOpen
 } from 'lucide-react'
+import logo from '../assets/logo.png'
 import './Sidebar.css'
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed, toggleSidebar }) => {
 
     const navItems = [
         { path: '/', icon: FileText, label: 'All Projects' },
@@ -15,17 +19,18 @@ const Sidebar = () => {
     ]
 
     return (
-        <aside className="sidebar glass-strong">
+        <aside className={`sidebar glass-strong ${isCollapsed ? 'collapsed' : ''}`}>
             {/* Logo */}
             <div className="sidebar-header">
-                <div className="logo">
+                <div className={`logo ${isCollapsed ? 'justify-center' : ''}`}>
                     <div className="logo-icon">
-                        <Zap size={28} strokeWidth={2.5} />
+                        <img src={logo} alt="Besttest Logo" style={{ width: '40px', height: '40px' }} />
                     </div>
-                    <div className="logo-text">
-                        <h1 className="gradient-text">AutoTest</h1>
-                        <p>Center</p>
-                    </div>
+                    {!isCollapsed && (
+                        <div className="logo-text">
+                            <h1 className="gradient-text">Besttest</h1>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -37,12 +42,18 @@ const Sidebar = () => {
                         to={item.path}
                         className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
                         end={item.path === '/'}
+                        title={isCollapsed ? item.label : ''}
                     >
                         <item.icon size={20} />
-                        <span>{item.label}</span>
+                        {!isCollapsed && <span>{item.label}</span>}
                     </NavLink>
                 ))}
             </nav>
+
+            {/* Toggle Button */}
+            <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
+                {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            </button>
 
         </aside>
     )

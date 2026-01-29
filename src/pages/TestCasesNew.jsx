@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Plus, ChevronDown, ChevronRight, Edit, Trash2, Play, MoreVertical, Search, X } from 'lucide-react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useNavigate, useLocation, useParams, Link } from 'react-router-dom'
 import './TestCasesNew.css'
 
 // Internal Components
@@ -20,6 +20,7 @@ const MemoizedTestResultsListView = React.memo(TestResultsListView)
 
 const TestCasesNew = () => {
     const navigate = useNavigate()
+    const location = useLocation()
     const { projectId } = useParams()
     const [projectInfo, setProjectInfo] = useState({ name: 'Loading...' })
 
@@ -64,6 +65,13 @@ const TestCasesNew = () => {
 
     // UI State
     const [activeTab, setActiveTab] = useState('summary')
+
+    // Update tab if location state changes
+    useEffect(() => {
+        if (location.state?.activeTab) {
+            setActiveTab(location.state.activeTab)
+        }
+    }, [location.state])
     const [searchQuery, setSearchQuery] = useState('')
 
     // Modal Visibility State
@@ -367,8 +375,8 @@ const TestCasesNew = () => {
 
     const runTestPlan = useCallback((plan) => {
         // Navigate to execution view
-        navigate('/test-results', { state: { testPlan: plan, allTestCases: getAllTestCases() } })
-    }, [navigate, getAllTestCases])
+        navigate(`/project/${projectId}/test-results`, { state: { testPlan: plan, allTestCases: getAllTestCases() } })
+    }, [navigate, projectId, getAllTestCases])
 
     // --- Handlers: Test Results ---
     const handleEditResult = useCallback((result) => {

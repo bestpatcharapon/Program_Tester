@@ -1,7 +1,7 @@
 {
-  "name": "autotest-center",
+  "name": "besttest",
   "version": "1.0.0",
-  "description": "Enterprise AutoTest Center Dashboard with Evidence Gallery",
+  "description": "Besttest - Automated Testing Dashboard with Evidence Gallery",
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",

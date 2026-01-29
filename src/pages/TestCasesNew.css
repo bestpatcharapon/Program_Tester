@@ -240,15 +240,14 @@
 .donut-chart {
     width: 160px;
     height: 160px;
-    transform: rotate(-90deg);
+    /* Transformation handled in SVG elements */
 }
 
 .chart-text {
     font-size: 1.5rem;
     font-weight: 600;
     fill: #0f172a;
-    transform: rotate(90deg);
-    transform-origin: center;
+    dominant-baseline: middle;
 }
 
 .legend-dot {
@@ -859,6 +858,7 @@ input[type="checkbox"] {
         transform: translateY(0);
     }
 }
+
 /* Breadcrumbs */
 .breadcrumbs {
     display: flex;
@@ -892,3 +892,64 @@ input[type="checkbox"] {
     font-weight: 600;
 }
 
+
+/* --- Fixes for Chart & History --- */
+
+/* History List Styling */
+
+/* History List Styling */
+.history-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Align center */
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.history-plan {
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 0.9rem;
+    display: block;
+}
+
+.history-date {
+    color: #94a3b8;
+    font-size: 0.75rem;
+    display: block;
+}
+
+.history-tags {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tag {
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.tag.passed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.tag.failed {
+    background: #fee2e2;
+    color: #b91c1c;
+}
